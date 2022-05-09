@@ -1,0 +1,186 @@
+openapi: 3.1.0
+info:
+  title: Ice Cream Shop
+  version: '1.0'
+  summary: Fictional ice cream store e-commerce API to order a tasty dessert!
+  description: 'This fictional ice cream store needs an API to allow people to order their favorite desserts. One endpoint will let them retrieve the menu of flavors and customizations, and the other endpoint will let them submit an order.'
+  contact:
+    name: Fake Store Owner
+    url: 'http://localhost:3000'
+    email: nobody@example.com
+  termsOfService: 'http://localhost:3000/terms-of-service'
+  license:
+    name: Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+    url: 'https://creativecommons.org/licenses/by-nc/4.0/'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /menu:
+    parameters: []
+    get:
+      summary: Fetch the current inventory for making an order
+      responses:
+        '200':
+          description: 'Menu is found, and retrieved'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuInventory'
+              examples:
+                Get the menu for today:
+                  value:
+                    flavors:
+                      - flavorName: Strawberry
+                        count: 50
+                      - flavorName: Chocolate
+                        count: 75
+                    toppings:
+                      - toppingName: Hot Fudge
+                        count: 50
+                      - toppingName: Sprinkles
+                        count: 2000
+                      - toppingName: Whipped Cream
+                        count: 50
+            application/javascript:
+              schema:
+                type: object
+                properties: {}
+      operationId: get-menu
+      description: Retrieve the current menu from the inventory database
+  /order:
+    post:
+      summary: Create New Order
+      operationId: post-order
+      responses:
+        '201':
+          description: 'Order created, thank you!'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuInventory'
+              examples:
+                New Order Success:
+                  value:
+                    flavors:
+                      - flavorName: Strawberry
+                        count: 1
+                      - flavorName: Chocolate
+                        count: 1
+                    toppings:
+                      - toppingName: Hot Fudge
+                        count: 1
+                      - toppingName: Sprinkles
+                        count: 2
+                      - toppingName: Whipped Cream
+                        count: 1
+        '400':
+          description: 'Missing Required Information, or flavor/topping requested was not available'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  details:
+                    type: string
+              examples:
+                Item out of stock:
+                  value:
+                    message: Could not create your order
+                    details: 'Sorry, one or more items in your order were not available, please check the menu and try again'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              x-examples:
+                example-1:
+                  flavors:
+                    Strawberry: 1
+                    Chocolate: 1
+                  toppings:
+                    HotFudge: 1
+                    Sprinkles: 2
+                    Whipped Cream: 1
+              properties:
+                flavors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      flavorName:
+                        type: string
+                      count:
+                        type: integer
+                toppings:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      toppingName:
+                        type: string
+                      count:
+                        type: integer
+            examples:
+              Create an Order:
+                value:
+                  flavors:
+                    - flavorName: Strawberry
+                      count: 1
+                    - flavorName: Chocolate
+                      count: 1
+                  toppings:
+                    - toppingName: Hot Fudge
+                      count: 1
+                    - toppingName: Sprinkles
+                      count: 2
+                    - toppingName: Whipped Cream
+                      count: 1
+        description: Post the necessary fields for the API to create a new order.
+      description: User will send a structure of data to place an online order
+    parameters: []
+components:
+  schemas:
+    MenuInventory:
+      type: object
+      x-examples:
+        example-1:
+          flavors:
+            - flavorName: Strawberry
+              count: 100
+            - flavorName: Chocolate
+              count: 100
+          toppings:
+            - toppingName: Hot Fudge
+              count: 50
+            - toppingName: Sprinkles
+              count: 2000
+
+      title: InventoryOrder
+      description: 'Structure of menu data passed to the user to show existing inventory, and also passed by the user when placing an order'
+      properties:
+        flavors:
+          type: array
+          items:
+            type: object
+            properties:
+              flavorName:
+                type: string
+              count:
+                type: integer
+        toppings:
+          type: array
+          items:
+            type: object
+            properties:
+              toppingName:
+                type: string
+              count:
+                type: integer
+  securitySchemes:
+    x-api-key:
+      name: abc123
+      type: apiKey
+      in: header
+security: []
